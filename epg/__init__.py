@@ -46,46 +46,47 @@ class Plugin_OBJ():
                 cdict = fHDHR.tools.xmldictmaker(c, ["name", "number", "_id", "timelines", "colorLogoPNG"], list_items=["timelines"])
 
                 chan_obj = self.channels.get_channel_obj("origin_id", cdict["_id"], self.plugin_utils.namespace)
+                if chan_obj:
 
-                if str(chan_obj.dict['number']) not in list(programguide.keys()):
+                    if str(chan_obj.number) not in list(programguide.keys()):
 
-                    programguide[str(chan_obj.number)] = chan_obj.epgdict
+                        programguide[str(chan_obj.number)] = chan_obj.epgdict
 
-                for program_item in cdict["timelines"]:
+                    for program_item in cdict["timelines"]:
 
-                    progdict = fHDHR.tools.xmldictmaker(program_item, ['_id', 'start', 'stop', 'title', 'episode'])
-                    episodedict = fHDHR.tools.xmldictmaker(program_item['episode'], ['duration', 'poster', '_id', 'rating', 'description', 'genre', 'subGenre', 'name'])
+                        progdict = fHDHR.tools.xmldictmaker(program_item, ['_id', 'start', 'stop', 'title', 'episode'])
+                        episodedict = fHDHR.tools.xmldictmaker(program_item['episode'], ['duration', 'poster', '_id', 'rating', 'description', 'genre', 'subGenre', 'name'])
 
-                    if episodedict["duration"]:
-                        episodedict["duration"] = self.duration_pluto_minutes(episodedict["duration"])
+                        if episodedict["duration"]:
+                            episodedict["duration"] = self.duration_pluto_minutes(episodedict["duration"])
 
-                        clean_prog_dict = {
-                                            "time_start": self.xmltimestamp_pluto(progdict["start"]),
-                                            "time_end": self.xmltimestamp_pluto(progdict["stop"]),
-                                            "duration_minutes": episodedict["duration"],
-                                            "thumbnail": None,
-                                            "title": progdict['title'] or "Unavailable",
-                                            "sub-title": episodedict['name'] or "Unavailable",
-                                            "description": episodedict['description'] or "Unavailable",
-                                            "rating": episodedict['rating'] or "N/A",
-                                            "episodetitle": None,
-                                            "releaseyear": None,
-                                            "genres": [],
-                                            "seasonnumber": None,
-                                            "episodenumber": None,
-                                            "isnew": False,
-                                            "id": str(episodedict['_id'] or "%s_%s" % (chan_obj.dict['origin_id'], self.xmltimestamp_pluto(progdict["start"])))
-                                            }
-                        try:
-                            thumbnail = episodedict["poster"]["path"].split("?")[0]
-                        except TypeError:
-                            thumbnail = None
-                        clean_prog_dict["thumbnail"] = thumbnail
+                            clean_prog_dict = {
+                                                "time_start": self.xmltimestamp_pluto(progdict["start"]),
+                                                "time_end": self.xmltimestamp_pluto(progdict["stop"]),
+                                                "duration_minutes": episodedict["duration"],
+                                                "thumbnail": None,
+                                                "title": progdict['title'] or "Unavailable",
+                                                "sub-title": episodedict['name'] or "Unavailable",
+                                                "description": episodedict['description'] or "Unavailable",
+                                                "rating": episodedict['rating'] or "N/A",
+                                                "episodetitle": None,
+                                                "releaseyear": None,
+                                                "genres": [],
+                                                "seasonnumber": None,
+                                                "episodenumber": None,
+                                                "isnew": False,
+                                                "id": str(episodedict['_id'] or "%s_%s" % (chan_obj.dict['origin_id'], self.xmltimestamp_pluto(progdict["start"])))
+                                                }
+                            try:
+                                thumbnail = episodedict["poster"]["path"].split("?")[0]
+                            except TypeError:
+                                thumbnail = None
+                            clean_prog_dict["thumbnail"] = thumbnail
 
-                        clean_prog_dict["genres"].extend(episodedict["genre"].split(" \\u0026 "))
-                        clean_prog_dict["genres"].append(episodedict["subGenre"])
+                            clean_prog_dict["genres"].extend(episodedict["genre"].split(" \\u0026 "))
+                            clean_prog_dict["genres"].append(episodedict["subGenre"])
 
-                        if not any((d['time_start'] == clean_prog_dict['time_start'] and d['id'] == clean_prog_dict['id']) for d in programguide[chan_obj.number]["listing"]):
-                            programguide[str(chan_obj.number)]["listing"].append(clean_prog_dict)
+                            if not any((d['time_start'] == clean_prog_dict['time_start'] and d['id'] == clean_prog_dict['id']) for d in programguide[chan_obj.number]["listing"]):
+                                programguide[str(chan_obj.number)]["listing"].append(clean_prog_dict)
 
         return programguide
