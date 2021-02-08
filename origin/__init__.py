@@ -8,6 +8,9 @@ class Plugin_OBJ():
     def __init__(self, plugin_utils):
         self.plugin_utils = plugin_utils
 
+        self.tuners = self.plugin_utils.config.dict["plutotv"]["tuners"]
+        self.stream_method = self.plugin_utils.config.dict["plutotv"]["stream_method"]
+
         self.base_api_url = 'https://api.pluto.tv'
         self.login_url = "%s/v1/auth/local" % self.base_api_url
 
