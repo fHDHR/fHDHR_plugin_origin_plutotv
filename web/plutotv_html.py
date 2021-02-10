@@ -15,7 +15,7 @@ class PlutoTV_HTML():
 
         self.origin = plugin_utils.origin
 
-        self.template_file = pathlib.Path(fhdhr.config.dict["plugin_web_paths"][plugin_utils.namespace]["path"]).joinpath('plutotv.html')
+        self.template_file = pathlib.Path(plugin_utils.path).joinpath('plutotv.html')
         self.template = StringIO()
         self.template.write(open(self.template_file).read())
 
@@ -27,7 +27,7 @@ class PlutoTV_HTML():
         if self.origin.setup_success:
             origin_status_dict = {
                                     "Login": "Success" if self.plugin_utils.origin.userid else "Guest Mode",
-                                    "Username": self.plugin_utils.config.dict["plutotv"]["username"]
+                                    "Username": self.plugin_utils.origin.username
                                     }
         else:
             origin_status_dict = {"Setup": "Failed"}

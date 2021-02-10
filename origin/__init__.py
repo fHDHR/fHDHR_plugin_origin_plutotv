@@ -8,9 +8,6 @@ class Plugin_OBJ():
     def __init__(self, plugin_utils):
         self.plugin_utils = plugin_utils
 
-        self.tuners = self.plugin_utils.config.dict["plutotv"]["tuners"]
-        self.stream_method = self.plugin_utils.config.dict["plutotv"]["stream_method"]
-
         self.base_api_url = 'https://api.pluto.tv'
         self.login_url = "%s/v1/auth/local" % self.base_api_url
 
@@ -19,17 +16,33 @@ class Plugin_OBJ():
 
         self.login()
 
+    @property
+    def tuners(self):
+        return self.plugin_utils.config.dict["plutotv"]["tuners"]
+
+    @property
+    def stream_method(self):
+        return self.plugin_utils.config.dict["plutotv"]["stream_method"]
+
+    @property
+    def username(self):
+        return self.plugin_utils.config.dict["plutotv"]["username"]
+
+    @property
+    def password(self):
+        return self.plugin_utils.config.dict["plutotv"]["password"]
+
     def login(self):
         self.plugin_utils.logger.info("Logging into PlutoTV")
-        if (not self.plugin_utils.config.dict["plutotv"]["username"] or not self.plugin_utils.config.dict["plutotv"]["password"]):
+        if (not self.username or not self.password):
             self.plugin_utils.logger.warning("No Username/Password set, will operate in Guest Mode.")
             return True
 
         form_data = {
                       'optIn': 'true',
-                      'password': self.plugin_utils.config.dict["plutotv"]["password"],
+                      'password': self.password,
                       'synced': 'false',
-                      'email': self.plugin_utils.config.dict["plutotv"]["username"]
+                      'email': self.username
                       }
         try:
             loginreq = self.plugin_utils.web.session.post(self.login_url, data=form_data)
