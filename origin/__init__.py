@@ -80,6 +80,8 @@ class Plugin_OBJ():
                         thumbnail = channel_dict[thumb_opt]["path"].split("?")[0]
                     except TypeError:
                         thumbnail = None
+                    except KeyError:
+                        thumbnail = None
                     if thumbnail:
                         thumbnails.append(thumbnail)
                 if not len(thumbnails):
