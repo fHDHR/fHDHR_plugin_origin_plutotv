@@ -17,20 +17,16 @@ class Plugin_OBJ():
         self.login()
 
     @property
-    def tuners(self):
-        return self.plugin_utils.config.dict["plutotv"]["tuners"]
-
-    @property
-    def stream_method(self):
-        return self.plugin_utils.config.dict["plutotv"]["stream_method"]
+    def config_dict(self):
+        return self.plugin_utils.config.dict["plutotv"]
 
     @property
     def username(self):
-        return self.plugin_utils.config.dict["plutotv"]["username"]
+        return self.config_dict["username"]
 
     @property
     def password(self):
-        return self.plugin_utils.config.dict["plutotv"]["password"]
+        return self.config_dict["password"]
 
     def login(self):
         self.plugin_utils.logger.info("Logging into PlutoTV")
