@@ -17,6 +17,13 @@ class Plugin_OBJ():
         self.login()
 
     @property
+    def webpage_dict(self):
+        return {
+                "Login": "Success" if self.userid else "Guest Mode",
+                "Username": self.username
+                }
+
+    @property
     def config_dict(self):
         return self.plugin_utils.config.dict["plutotv"]
 
