@@ -14,10 +14,13 @@ class Plugin_OBJ():
 
         self.base_api_url = 'https://api.pluto.tv'
 
-    def xmltimestamp_pluto(self, inputtime):
+    def xmltime_pluto(self, inputtime):
         xmltime = inputtime.replace('Z', '+00:00')
-        xmltime = datetime.datetime.fromisoformat(xmltime).timestamp()
+        xmltime = datetime.datetime.fromisoformat(xmltime)
         return xmltime
+
+    def xmltimestamp_pluto(self, inputtime):
+        return self.xmltime_pluto(inputtime).timestamp()
 
     def duration_pluto_minutes(self, induration):
         return ((int(induration))/1000/60)
@@ -59,22 +62,25 @@ class Plugin_OBJ():
 
                         if episodedict["duration"]:
                             episodedict["duration"] = self.duration_pluto_minutes(episodedict["duration"])
+                            genres = [k.split(" \\u0026 ") for k in [episodedict.get(k) for k in ("genre", "subGenre")] if k is not None]
+                            if 'clip' in episodedict and 'originalReleaseDate' in episodedict['clip']:
+                                releaseyear = self.xmltime_pluto(episodedict['clip']['originalReleaseDate']).year
 
                             clean_prog_dict = {
                                                 "time_start": self.xmltimestamp_pluto(progdict["start"]),
                                                 "time_end": self.xmltimestamp_pluto(progdict["stop"]),
                                                 "duration_minutes": episodedict["duration"],
                                                 "thumbnail": None,
-                                                "title": progdict['title'] or "Unavailable",
-                                                "sub-title": episodedict['name'] or "Unavailable",
-                                                "description": episodedict['description'] or "Unavailable",
-                                                "rating": episodedict['rating'] or "N/A",
-                                                "episodetitle": None,
-                                                "releaseyear": None,
-                                                "genres": [],
-                                                "seasonnumber": None,
-                                                "episodenumber": None,
-                                                "isnew": False,
+                                                "title": progdict.get("title") or "Unavailable",
+                                                "sub-title": episodedict.get("name") or "Unavailable",
+                                                "description": episodedict.get("description") or "Unavailable",
+                                                "rating": episodedict.get("rating") or "N/A",
+                                                "episodetitle": episodedict.get("name") or "Unavailable",
+                                                "releaseyear": releaseyear,
+                                                "genres": genres,
+                                                "seasonnumber": episodedict.get("season") or "Unavailable",
+                                                "episodenumber": episodedict.get("number") or "Unavailable",
+                                                "isnew": episodedict.get("liveBroadcast") or False,
                                                 "id": str(episodedict['_id'] or "%s_%s" % (chan_obj.dict['origin_id'], self.xmltimestamp_pluto(progdict["start"])))
                                                 }
                             try:
@@ -82,9 +88,6 @@ class Plugin_OBJ():
                             except TypeError:
                                 thumbnail = None
                             clean_prog_dict["thumbnail"] = thumbnail
-
-                            clean_prog_dict["genres"].extend(episodedict["genre"].split(" \\u0026 "))
-                            clean_prog_dict["genres"].append(episodedict["subGenre"])
 
                             if not any((d['time_start'] == clean_prog_dict['time_start'] and d['id'] == clean_prog_dict['id']) for d in programguide[chan_obj.number]["listing"]):
                                 programguide[str(chan_obj.number)]["listing"].append(clean_prog_dict)
