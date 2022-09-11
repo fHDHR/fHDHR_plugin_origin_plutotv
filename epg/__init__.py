@@ -1,3 +1,4 @@
+from functools import reduce
 import datetime
 
 import fHDHR.tools
@@ -63,6 +64,7 @@ class Plugin_OBJ():
                         if episodedict["duration"]:
                             episodedict["duration"] = self.duration_pluto_minutes(episodedict["duration"])
                             genres = [k.split(" \\u0026 ") for k in [episodedict.get(k) for k in ("genre", "subGenre")] if k is not None]
+                            genres = reduce(lambda x,y: x+y, genres)
                             if 'clip' in episodedict and 'originalReleaseDate' in episodedict['clip']:
                                 releaseyear = self.xmltime_pluto(episodedict['clip']['originalReleaseDate']).year
 
